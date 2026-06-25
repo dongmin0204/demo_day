@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router';
 import { AlertTriangle, ChevronRight, FileText, Image as ImageIcon, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/app/components/ui/button';
-import { Card, CardContent } from '@/app/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/app/components/ui/tabs';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { DisclaimerBanner } from '@/components/common/DisclaimerBanner';
 import { RiskBadge } from '@/components/common/RiskBadge';
+import { RiskGauge } from '@/components/common/RiskGauge';
 import { useAnalysisContext } from '@/contexts/AnalysisContext';
 import type { AnalysisResult } from '@/types';
 import {
@@ -17,11 +17,13 @@ import {
 } from '@/utils/risk';
 import {
   downloadSessionAsImage,
-  formatSessionDate,
   getSessionFileDatePrefix,
   groupSessionItems,
   saveSessionAsPdf,
 } from '@/utils/share';
+
+const CARD = 'rounded-2xl border border-[#ECEFF3] bg-white shadow-[0_1px_2px_rgba(16,24,40,0.04)]';
+const LABEL = 'font-mono text-[11px] uppercase tracking-[0.14em] text-gray-400';
 
 const tabFilters: {
   value: string;
@@ -50,7 +52,7 @@ export default function ResultsPage() {
       <PageContainer title="분석 결과" showBackButton showBottomNav={false}>
         <div className="flex flex-col items-center py-20">
           <p className="text-gray-400">분석 결과가 없습니다.</p>
-          <Button variant="outline" className="mt-4" onClick={() => navigate('/combine')}>
+          <Button variant="outline" className="mt-4 rounded-xl" onClick={() => navigate('/combine')}>
             분석하러 가기
           </Button>
         </div>
@@ -65,10 +67,11 @@ export default function ResultsPage() {
       )
     : session.results;
   const { drugs, foods, supplements } = groupSessionItems(session);
-  const dateStr = formatSessionDate(session.createdAt);
   const totalPairs = (session.items.length * (session.items.length - 1)) / 2;
   const noInfoCount = totalPairs - session.results.length;
   const exportFilePrefix = getSessionFileDatePrefix(session.createdAt);
+  const criticalCount = countBySeverity(session.results, 'critical');
+  const cautionCount = countBySeverity(session.results, 'caution');
 
   const handleImageSave = async () => {
     try {
@@ -91,65 +94,57 @@ export default function ResultsPage() {
     }
   };
 
+  const selectedRows: [string, number, string[]][] = [
+    ['약물', drugs.length, drugs.map((i) => i.name)],
+    ['음식', foods.length, foods.map((i) => i.name)],
+    ['영양제', supplements.length, supplements.map((i) => i.name)],
+  ];
+
   return (
     <PageContainer title="분석 결과" showBackButton showBottomNav={false}>
-      <div className="space-y-4">
+      <div className="space-y-5">
         <DisclaimerBanner />
 
-        {/* Summary card */}
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-500">전체 분석 항목</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {session.results.length}건
-                </p>
-              </div>
-              <RiskBadge severity={session.overallSeverity} className="text-sm px-3 py-1" />
-            </div>
-            <div className="mt-3 flex flex-wrap gap-2 text-xs text-gray-500">
-              {(['critical', 'caution'] as RiskDisplaySeverity[]).map((sev) => {
-                const count = countBySeverity(session.results, sev);
-                if (count === 0) return null;
-                return (
-                  <span key={sev}>
-                    {sev === 'critical' ? '금기' : '주의'} {count}개
-                  </span>
-                );
-              })}
-            </div>
-            <div className="mt-4 space-y-3 rounded-2xl bg-gray-50 p-4">
-              <p className="text-sm font-semibold text-gray-900">선택 항목</p>
-              <div>
-                <p className="text-xs font-semibold text-gray-500">약물 ({drugs.length}개)</p>
-                <p className="mt-1 text-sm text-gray-900">
-                  {drugs.length > 0 ? drugs.map((item) => item.name).join(', ') : '없음'}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-gray-500">음식 ({foods.length}개)</p>
-                <p className="mt-1 text-sm text-gray-900">
-                  {foods.length > 0 ? foods.map((item) => item.name).join(', ') : '없음'}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-gray-500">영양제 ({supplements.length}개)</p>
-                <p className="mt-1 text-sm text-gray-900">
-                  {supplements.length > 0 ? supplements.map((item) => item.name).join(', ') : '없음'}
-                </p>
+        {/* Summary — hero */}
+        <div>
+          <p className={LABEL}>Analysis</p>
+          <div className="mt-2 flex items-center gap-4">
+            <RiskGauge severity={session.overallSeverity} size={56} />
+            <div className="min-w-0">
+              <p className="text-[26px] font-bold leading-[1.15] tracking-[-0.02em] text-foreground">
+                {session.results.length}건의 상호작용
+              </p>
+              <div className="mt-1.5 flex items-center gap-3 font-mono text-[12px]">
+                {criticalCount > 0 && <span className="text-[#DC2626]">금기 {criticalCount}</span>}
+                {cautionCount > 0 && <span className="text-[#D97706]">주의 {cautionCount}</span>}
+                <span className="text-gray-400">분석 {totalPairs}건</span>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
+
+        {/* Selected items */}
+        <div className={`${CARD} p-4`}>
+          <p className={LABEL}>선택 항목</p>
+          <div className="mt-2.5 space-y-2">
+            {selectedRows.map(([label, count, names]) => (
+              <div key={label} className="flex gap-2 text-[13px]">
+                <span className="shrink-0 text-gray-400">
+                  {label} ({count})
+                </span>
+                <span className="text-gray-800">{count > 0 ? names.join(', ') : '없음'}</span>
+              </div>
+            ))}
+          </div>
+        </div>
 
         {/* 금기 요약 블록 */}
-        {countBySeverity(session.results, 'critical') > 0 && (
+        {criticalCount > 0 && (
           <div className="space-y-3 rounded-2xl border border-red-200 bg-red-50 p-4">
             <div className="flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 shrink-0 text-red-600" />
-              <p className="text-sm font-semibold text-red-700">
-                금기 조합 {countBySeverity(session.results, 'critical')}건이 발견됐어요
+              <AlertTriangle className="h-4 w-4 shrink-0 text-red-600" strokeWidth={1.75} />
+              <p className="text-[14px] font-semibold text-red-700">
+                금기 조합 {criticalCount}건이 발견됐어요
               </p>
             </div>
             <div className="space-y-2">
@@ -160,18 +155,20 @@ export default function ResultsPage() {
                     key={r.id}
                     type="button"
                     onClick={() => navigate(`/detail/${r.id}`)}
-                    className="w-full rounded-xl border border-red-100 bg-white px-3 py-2.5 text-left transition-colors hover:bg-red-50"
+                    className="w-full rounded-xl border border-red-100 bg-white px-3 py-2.5 text-left transition-colors hover:bg-red-50/60"
                   >
-                    <p className="text-pretty text-sm font-medium text-gray-900">
+                    <p className="text-pretty text-[14px] font-medium text-foreground">
                       {r.rule.subjectName} + {r.rule.objectName}
                     </p>
-                    <p className="mt-0.5 flex items-center gap-0.5 text-xs font-medium text-red-500">
+                    <p className="mt-0.5 flex items-center gap-0.5 font-mono text-[11px] font-medium text-red-500">
                       자세히 보기 <ChevronRight className="h-3 w-3" />
                     </p>
                   </button>
                 ))}
             </div>
-            <p className="text-xs font-medium text-red-600">지금 바로 의사나 약사에게 상담하세요.</p>
+            <p className="font-mono text-[11px] font-medium text-red-600">
+              지금 바로 의사나 약사에게 상담하세요.
+            </p>
           </div>
         )}
 
@@ -204,79 +201,68 @@ export default function ResultsPage() {
           ))}
         </Tabs>
 
-        {/* Result cards */}
-        <div className="space-y-2">
+        {/* Result cards — gauge + badge + pair, matching home */}
+        <div className="space-y-2.5">
           {filteredResults.length === 0 ? (
             <p className="py-8 text-center text-sm text-gray-400">
               해당 카테고리의 결과가 없습니다.
             </p>
           ) : (
             filteredResults.map((result) => (
-              <Card
+              <button
                 key={result.id}
-                className="cursor-pointer transition-colors hover:bg-gray-50"
+                type="button"
                 onClick={() => navigate(`/detail/${result.id}`)}
+                className={`flex w-full items-center gap-3 p-4 text-left transition-colors hover:bg-gray-50 ${CARD}`}
               >
-                <CardContent className="flex items-center gap-3 p-4">
-                  <RiskBadge severity={result.severity} />
-                  <div className="min-w-0 flex-1">
-                    <p className="text-pretty font-medium text-gray-900" data-slot="result-pair-name">
-                      {result.rule.subjectName} + {result.rule.objectName}
-                    </p>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {getRiskSupportTags(result).map((tag) => (
-                        <span
-                          key={tag}
-                          className="rounded-full bg-orange-50 px-2.5 py-1 text-xs font-medium text-orange-700"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                    {getRiskDisplaySeverity(result.severity) === 'unknown' && (
-                      <p className="mt-1 text-xs font-medium text-amber-600">
-                        확인 정보 없음은 안전함을 의미하지 않습니다.
-                      </p>
-                    )}
+                <RiskGauge severity={result.severity} />
+                <div className="min-w-0 flex-1">
+                  <p className="text-pretty font-medium tracking-[-0.01em] text-foreground" data-slot="result-pair-name">
+                    {result.rule.subjectName} + {result.rule.objectName}
+                  </p>
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <RiskBadge severity={result.severity} />
+                    {getRiskSupportTags(result).map((tag) => (
+                      <span
+                        key={tag}
+                        className="rounded-full bg-orange-50 px-2.5 py-1 text-xs font-medium text-orange-700"
+                      >
+                        {tag}
+                      </span>
+                    ))}
                   </div>
-                  <ChevronRight className="h-4 w-4 shrink-0 text-gray-300" />
-                </CardContent>
-              </Card>
+                  {getRiskDisplaySeverity(result.severity) === 'unknown' && (
+                    <p className="mt-1.5 text-[12px] font-medium text-amber-600">
+                      확인 정보 없음은 안전함을 의미하지 않습니다.
+                    </p>
+                  )}
+                </div>
+                <ChevronRight className="h-4 w-4 shrink-0 text-gray-300" />
+              </button>
             ))
           )}
         </div>
 
         {/* No-info summary */}
         {noInfoCount > 0 && (
-          <p className="text-center text-xs text-gray-400">
+          <p className="text-center font-mono text-[11px] text-gray-400">
             이 외 {noInfoCount}개 조합은 확인된 상호작용 정보가 없어요
           </p>
         )}
 
         {/* Bottom actions */}
         <div className="grid grid-cols-3 gap-2 pb-4" data-slot="export-actions">
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={handleImageSave}
-          >
+          <Button variant="outline" className="w-full rounded-xl" onClick={handleImageSave}>
             <ImageIcon className="mr-2 h-4 w-4" />
-            이미지 저장
+            이미지
           </Button>
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={handlePdfSave}
-          >
+          <Button variant="outline" className="w-full rounded-xl" onClick={handlePdfSave}>
             <FileText className="mr-2 h-4 w-4" />
-            PDF 저장
+            PDF
           </Button>
-          <Button
-            className="w-full"
-            onClick={() => navigate(`/share/${session.id}`)}
-          >
+          <Button className="w-full rounded-xl" onClick={() => navigate(`/share/${session.id}`)}>
             <Share2 className="mr-2 h-4 w-4" />
-            공유하기
+            공유
           </Button>
         </div>
       </div>

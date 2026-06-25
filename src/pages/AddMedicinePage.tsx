@@ -127,13 +127,13 @@ export default function AddMedicinePage() {
                   }`}
                 >
                   <div className="min-w-0 flex-1 text-left">
-                    <p className="truncate text-sm font-medium text-gray-900">
+                    <p className="truncate text-sm font-medium text-foreground">
                       {result.medicine.productName}
                     </p>
                     <p className="text-xs text-gray-500">{result.medicine.manufacturer}</p>
                   </div>
                   {isAdded
-                    ? <Check className="h-4 w-4 shrink-0 text-blue-500" />
+                    ? <Check className="h-4 w-4 shrink-0 text-gray-700" />
                     : <Plus className="h-4 w-4 shrink-0 text-gray-400" />
                   }
                 </button>
@@ -151,8 +151,8 @@ export default function AddMedicinePage() {
 
         {!query && medicineState.selectedMedicines.length === 0 && ocrResults.length === 0 && !ocrLoading && (
           <div className="flex flex-col items-center gap-3 py-16 text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50">
-              <Plus className="h-7 w-7 text-blue-400" />
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-100">
+              <Plus className="h-7 w-7 text-gray-500" />
             </div>
             <div>
               <p className="text-sm font-medium text-gray-600">추가할 약을 검색하세요</p>
@@ -162,10 +162,10 @@ export default function AddMedicinePage() {
         )}
 
         {medicineState.selectedMedicines.length > 0 && (
-          <div className="fixed bottom-0 left-0 right-0 border-t bg-white p-4">
+          <div className="fixed bottom-0 left-0 right-0 border-t border-[#EFEFF1] bg-[#FBFBFC]/95 p-4 backdrop-blur">
             <div className="mx-auto max-w-lg">
-              <Button className="w-full" size="lg" onClick={() => navigate('/combine')}>
-                분석 화면으로 돌아가기
+              <Button className="h-[52px] w-full rounded-2xl text-[15px] font-semibold" onClick={() => navigate('/combine')}>
+                분석 화면으로 돌아가기 ({medicineState.selectedMedicines.length})
               </Button>
             </div>
           </div>

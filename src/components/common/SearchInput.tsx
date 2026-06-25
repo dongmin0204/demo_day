@@ -43,7 +43,7 @@ export function SearchInput({
       </div>
 
       {showDropdown && (
-        <div className="absolute z-10 mt-1 w-full rounded-md border border-gray-200 bg-white shadow-lg">
+        <div className="absolute z-10 mt-1.5 w-full overflow-hidden rounded-2xl border border-[#ECEFF3] bg-white shadow-[0_12px_32px_-8px_rgba(16,24,40,0.16)]">
           {isLoading ? (
             <div className="px-4 py-3 text-sm text-gray-500">검색 중...</div>
           ) : (
@@ -57,7 +57,7 @@ export function SearchInput({
                       onSelect(medicine);
                     }}
                   >
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className="text-sm font-medium text-foreground">
                       {medicine.productName}
                     </p>
                     <p className="text-xs text-gray-500">{medicine.manufacturer}</p>

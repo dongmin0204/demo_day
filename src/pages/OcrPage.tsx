@@ -115,19 +115,19 @@ export default function OcrPage() {
   return (
     <PageContainer title={pageTitle} showBackButton showBottomNav={false}>
       <div className="space-y-4">
-        <div className="rounded-xl border border-blue-100 bg-blue-50 px-4 py-3">
-          <p className="text-sm leading-relaxed text-blue-900">{helperText}</p>
+        <div className="rounded-xl border border-[#EFEFF1] bg-gray-100 px-4 py-3">
+          <p className="text-sm leading-relaxed text-gray-700">{helperText}</p>
         </div>
 
         {/* Upload area */}
         {!ocrResults && !isUploading && (
           <div
-            className="flex flex-col items-center gap-4 rounded-xl border-2 border-dashed border-gray-300 bg-white p-10 text-center transition-colors hover:border-blue-400"
+            className="flex flex-col items-center gap-4 rounded-xl border-2 border-dashed border-gray-300 bg-white p-10 text-center transition-colors hover:border-gray-400"
             onDragOver={(e) => e.preventDefault()}
             onDrop={handleDrop}
           >
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-50">
-              <Camera className="h-8 w-8 text-blue-500" />
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
+              <Camera className="h-8 w-8 text-gray-700" />
             </div>
             <div>
               <p className="font-medium text-gray-700">
@@ -159,7 +159,7 @@ export default function OcrPage() {
         {isUploading && (
           <Card>
             <CardContent className="flex flex-col items-center gap-4 p-8">
-              <Loader2 className="h-10 w-10 animate-spin text-blue-500" />
+              <Loader2 className="h-10 w-10 animate-spin text-gray-700" />
               <p className="font-medium text-gray-700">인식 중...</p>
               <Progress value={progress} className="w-full" />
               <p className="text-sm text-gray-400">{progress}%</p>
@@ -199,7 +199,7 @@ export default function OcrPage() {
                   <CardContent className="flex items-center justify-between p-3">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <p className="truncate font-medium text-gray-900">
+                        <p className="truncate font-medium text-foreground">
                           {result.medicine.productName}
                         </p>
                         {getConfidenceBadge(result.confidence)}
@@ -227,7 +227,7 @@ export default function OcrPage() {
             <div className="flex gap-2">
               <Button
                 variant="outline"
-                className="flex-1"
+                className="h-12 flex-1 rounded-2xl"
                 onClick={() => {
                   setOcrResults(null);
                   setProgress(0);
@@ -236,7 +236,7 @@ export default function OcrPage() {
                 다시 촬영
               </Button>
               <Button
-                className="flex-1"
+                className="h-12 flex-1 rounded-2xl text-[15px] font-semibold"
                 onClick={handleConfirm}
                 disabled={ocrResults.length === 0}
               >

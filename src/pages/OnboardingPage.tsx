@@ -172,14 +172,16 @@ export default function OnboardingPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-[linear-gradient(180deg,#f8fbff_0%,#ffffff_26%,#ffffff_100%)] px-6 py-8">
+      <div className="min-h-screen bg-[#FBFBFC] px-6 py-8">
         <div className="mx-auto flex max-w-lg flex-col gap-6">
-          <div className="flex flex-col items-center gap-2 pb-2">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-100">
-              <Pill className="h-8 w-8 text-blue-600" />
+          <div className="flex flex-col items-center gap-2.5 pb-2">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary">
+              <Pill className="h-7 w-7 text-white" strokeWidth={1.75} />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">약 조심</h1>
-            <p className="text-sm text-gray-500">안전한 복약을 위한 상호작용 안내</p>
+            <h1 className="text-[26px] font-bold tracking-[-0.02em] text-foreground">약 조심</h1>
+            <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-gray-400">
+              Medication Safety
+            </p>
           </div>
 
           {step === 'agreement' ? (
@@ -188,11 +190,11 @@ export default function OnboardingPage() {
                 {features.map(({ icon: Icon, title, description }) => (
                   <Card key={title} className="border-gray-200 shadow-sm">
                     <CardContent className="flex items-start gap-4 p-4">
-                      <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-blue-50">
-                        <Icon className="h-5 w-5 text-blue-600" />
+                      <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-gray-100">
+                        <Icon className="h-5 w-5 text-foreground" />
                       </div>
                       <div>
-                        <p className="font-medium text-gray-900">{title}</p>
+                        <p className="font-medium text-foreground">{title}</p>
                         <p className="mt-1 text-sm leading-6 text-gray-500">{description}</p>
                       </div>
                     </CardContent>
@@ -223,7 +225,7 @@ export default function OnboardingPage() {
 
               <Card className="border-gray-200 shadow-sm">
                 <CardContent className="space-y-3 p-5">
-                  <p className="text-base font-semibold text-gray-900">안내에 동의하셨나요?</p>
+                  <p className="text-base font-semibold text-foreground">안내에 동의하셨나요?</p>
 
                   <Button
                     onClick={() => setStep('profile')}
@@ -248,7 +250,7 @@ export default function OnboardingPage() {
               <Card className="border-gray-200 shadow-sm">
                 <CardContent className="space-y-5 p-5">
                   <div>
-                    <h2 className="text-lg font-semibold text-gray-900">기본 정보를 알려주세요</h2>
+                    <h2 className="text-lg font-semibold text-foreground">기본 정보를 알려주세요</h2>
                     <p className="mt-1 text-sm leading-6 text-gray-500">
                       입력한 정보에 따라 분석 결과와 주의 안내가 달라질 수 있어요.
                     </p>
@@ -383,19 +385,19 @@ export default function OnboardingPage() {
             <div className="space-y-3 rounded-2xl bg-gray-50 p-4">
               <div className="flex items-start justify-between gap-4">
                 <span className="text-sm font-medium text-gray-500">생년월일</span>
-                <span className="text-right text-sm text-gray-900">{formattedBirthDate}</span>
+                <span className="text-right text-sm text-foreground">{formattedBirthDate}</span>
               </div>
               <div className="flex items-start justify-between gap-4">
                 <span className="text-sm font-medium text-gray-500">성별</span>
-                <span className="text-right text-sm text-gray-900">{sexLabel}</span>
+                <span className="text-right text-sm text-foreground">{sexLabel}</span>
               </div>
               <div className="flex items-start justify-between gap-4">
                 <span className="text-sm font-medium text-gray-500">주요 만성질환</span>
-                <span className="text-right text-sm text-gray-900">{chronicConditionLabel}</span>
+                <span className="text-right text-sm text-foreground">{chronicConditionLabel}</span>
               </div>
               <div className="flex items-start justify-between gap-4">
                 <span className="text-sm font-medium text-gray-500">임신 여부</span>
-                <span className="text-right text-sm text-gray-900">{pregnancyLabel}</span>
+                <span className="text-right text-sm text-foreground">{pregnancyLabel}</span>
               </div>
             </div>
 

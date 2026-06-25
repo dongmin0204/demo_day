@@ -1,3 +1,4 @@
+verifyDepsBeforeRun: false
 allowBuilds:
   '@tailwindcss/oxide': true
   esbuild: true

@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router';
-import { ArrowLeft, Pill } from 'lucide-react';
-import { Button } from '@/app/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
 
 interface AppHeaderProps {
   title?: string;
@@ -13,25 +12,19 @@ export function AppHeader({ title = '약 조심', showBackButton = false }: AppH
   return (
     <header
       data-slot="app-header"
-      className="sticky top-0 z-50 flex h-14 items-center border-b border-gray-200 bg-white px-4"
+      className="sticky top-0 z-50 flex h-14 items-center gap-1 border-b border-[#EFEFF1] bg-[#FBFBFC]/85 px-3 backdrop-blur-sm"
     >
-      {showBackButton ? (
-        <Button
-          variant="ghost"
-          size="icon"
+      {showBackButton && (
+        <button
+          type="button"
           onClick={() => navigate(-1)}
           aria-label="뒤로가기"
+          className="grid h-9 w-9 place-items-center rounded-xl text-gray-700 transition-colors hover:bg-black/5"
         >
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-      ) : (
-        <div className="flex items-center gap-2">
-          <Pill className="h-6 w-6 text-blue-600" />
-        </div>
+          <ArrowLeft className="h-5 w-5" strokeWidth={1.75} />
+        </button>
       )}
-      <h1 className="flex-1 text-center text-lg font-semibold">{title}</h1>
-      {/* 오른쪽 균형을 위한 빈 공간 */}
-      <div className="w-10" />
+      <h1 className="text-[17px] font-semibold tracking-[-0.01em] text-foreground">{title}</h1>
     </header>
   );
 }

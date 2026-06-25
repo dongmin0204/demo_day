@@ -1,3 +1,11 @@
+/* v3 — global type: Pretendard for the whole app (loaded via index.html). */
+body {
+  font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont,
+    system-ui, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
 /* Risk-level design tokens — extend the project theme without overriding existing variables. */
 :root {
   --risk-danger: #DC2626;

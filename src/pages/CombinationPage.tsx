@@ -34,7 +34,7 @@ function ItemChip({
       onClick={onToggle}
       className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
         selected
-          ? 'bg-blue-600 text-white'
+          ? 'bg-primary text-primary-foreground'
           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
       }`}
     >
@@ -107,7 +107,7 @@ function AddSearchDialog<T extends { id: string }>({
                     }`}
                   >
                     <div>
-                      <span className="text-sm font-medium text-gray-900">{getLabel(item)}</span>
+                      <span className="text-sm font-medium text-foreground">{getLabel(item)}</span>
                       {getSubLabel && (
                         <span className="ml-2 text-xs text-gray-400">{getSubLabel(item)}</span>
                       )}
@@ -183,7 +183,7 @@ export default function CombinationPage() {
           <Button
             variant="outline"
             size="sm"
-            className="mt-3"
+            className="mt-3 rounded-xl"
             onClick={() => navigate('/add-medicine')}
           >
             <Plus className="mr-1 h-4 w-4" />
@@ -243,11 +243,10 @@ export default function CombinationPage() {
       </div>
 
       {/* Bottom fixed button */}
-      <div className="fixed bottom-0 left-0 right-0 border-t bg-white p-4">
-        <div className="mx-auto max-w-lg">
+      <div className="fixed bottom-0 left-0 right-0 border-t border-[#EFEFF1] bg-[#FBFBFC]/95 p-4 backdrop-blur">
+        <div className="mx-auto max-w-lg px-1">
           <Button
-            className="w-full"
-            size="lg"
+            className="h-[52px] w-full rounded-2xl text-[15px] font-semibold"
             disabled={!canAnalyze || isAnalyzing}
             onClick={handleAnalyze}
           >
@@ -263,9 +262,9 @@ export default function CombinationPage() {
           onInteractOutside={(e) => e.preventDefault()}
           onEscapeKeyDown={(e) => e.preventDefault()}
         >
-          <Loader2 className="h-10 w-10 animate-spin text-blue-600" />
+          <Loader2 className="h-10 w-10 animate-spin text-foreground" />
           <div className="space-y-1">
-            <p className="text-base font-semibold text-gray-900">분석 중이에요</p>
+            <p className="text-base font-semibold text-foreground">분석 중이에요</p>
             <p className="text-sm text-gray-500">상호작용을 확인하고 있어요. 잠시만 기다려 주세요.</p>
           </div>
         </DialogContent>

@@ -79,7 +79,7 @@ function InfoSearchPage({ onOcr }: { onOcr: () => void }) {
             <Card key={medicine.id} className="border-gray-200">
               <CardContent className="flex items-center justify-between gap-3 p-3">
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-gray-900">{medicine.productName}</p>
+                  <p className="truncate text-sm font-medium text-foreground">{medicine.productName}</p>
                   <p className="text-xs text-gray-500">{medicine.manufacturer}</p>
                 </div>
                 <Button variant="outline" size="sm" onClick={() => setViewedMedicine(medicine)}>
@@ -96,7 +96,7 @@ function InfoSearchPage({ onOcr }: { onOcr: () => void }) {
           <CardContent className="space-y-4 p-4">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-lg font-semibold text-gray-900">{viewedMedicine.productName}</p>
+                <p className="text-lg font-semibold text-foreground">{viewedMedicine.productName}</p>
                 <p className="mt-0.5 text-sm text-gray-500">{viewedMedicine.manufacturer}</p>
               </div>
               <button
@@ -108,33 +108,33 @@ function InfoSearchPage({ onOcr }: { onOcr: () => void }) {
               </button>
             </div>
             {viewedMedicine.indication && (
-              <div className="rounded-xl bg-blue-50 p-3">
-                <p className="text-xs font-medium text-blue-600">주요 용도</p>
+              <div className="rounded-xl bg-gray-100 p-3">
+                <p className="text-xs font-medium text-foreground">주요 용도</p>
                 <p className="mt-1 text-sm text-gray-800">{viewedMedicine.indication}</p>
               </div>
             )}
             <div className="grid grid-cols-2 gap-2">
               <div className="rounded-xl bg-gray-50 p-3">
                 <p className="text-xs font-medium text-gray-500">제형</p>
-                <p className="mt-1 text-sm text-gray-900">{viewedMedicine.dosageForm}</p>
+                <p className="mt-1 text-sm text-foreground">{viewedMedicine.dosageForm}</p>
               </div>
               <div className="rounded-xl bg-gray-50 p-3">
                 <p className="text-xs font-medium text-gray-500">구분</p>
-                <p className="mt-1 text-sm text-gray-900">{viewedMedicine.classification}</p>
+                <p className="mt-1 text-sm text-foreground">{viewedMedicine.classification}</p>
               </div>
             </div>
             <div className="rounded-xl bg-gray-50 p-3">
               <p className="text-xs font-medium text-gray-500">성분 정보</p>
               <div className="mt-2 space-y-1">
                 {viewedMedicine.ingredients.map((ingredient) => (
-                  <p key={ingredient.ingredient.id} className="text-sm text-gray-900">
+                  <p key={ingredient.ingredient.id} className="text-sm text-foreground">
                     {ingredient.ingredient.nameKo} {ingredient.amount}{ingredient.unit}
-                    {ingredient.isMain && <span className="ml-1 text-xs text-blue-600">주성분</span>}
+                    {ingredient.isMain && <span className="ml-1 text-xs text-foreground">주성분</span>}
                   </p>
                 ))}
               </div>
             </div>
-            <Button className="w-full" onClick={() => handleAddToAnalysis(viewedMedicine)}>
+            <Button className="h-12 w-full rounded-2xl text-[15px] font-semibold" onClick={() => handleAddToAnalysis(viewedMedicine)}>
               분석에 추가
             </Button>
           </CardContent>
@@ -156,7 +156,7 @@ function InfoSearchPage({ onOcr }: { onOcr: () => void }) {
           <button
             type="button"
             onClick={() => navigate('/combine')}
-            className="mt-1 flex items-center gap-1 text-xs text-blue-600 hover:underline"
+            className="mt-1 flex items-center gap-1 text-xs text-foreground hover:underline"
           >
             분석 화면으로 이동
             <ChevronRight className="h-3 w-3" />

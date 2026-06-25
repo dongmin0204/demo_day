@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/app/components/ui/card';
 
 interface SectionCardProps {
   title: string;
@@ -9,11 +8,13 @@ interface SectionCardProps {
 
 export function SectionCard({ title, children, className = '' }: SectionCardProps) {
   return (
-    <Card className={className}>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-base">{title}</CardTitle>
-      </CardHeader>
-      <CardContent>{children}</CardContent>
-    </Card>
+    <section className={className}>
+      <p className="mb-2.5 px-1 text-[13px] font-semibold tracking-[-0.01em] text-foreground">
+        {title}
+      </p>
+      <div className="rounded-2xl border border-[#ECEFF3] bg-white p-4 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
+        {children}
+      </div>
+    </section>
   );
 }

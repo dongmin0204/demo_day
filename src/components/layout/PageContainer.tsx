@@ -8,6 +8,8 @@ interface PageContainerProps {
   showBottomNav?: boolean;
   children: ReactNode;
   className?: string;
+  /** Override the root background. Defaults to the legacy gray surface. */
+  containerClassName?: string;
 }
 
 export function PageContainer({
@@ -16,15 +18,16 @@ export function PageContainer({
   showBottomNav = true,
   children,
   className = '',
+  containerClassName = 'bg-[#FBFBFC]',
 }: PageContainerProps) {
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50">
+    <div className={`flex min-h-screen flex-col ${containerClassName}`}>
       <AppHeader title={title} showBackButton={showBackButton} />
       {/* When bottom nav is visible, reserve vertical space for it here.
           Pages with their own fixed CTA still need extra bottom padding in page content. */}
       <main
         data-slot="app-main"
-        className={`flex-1 px-4 py-4 ${showBottomNav ? 'pb-20' : ''} ${className}`}
+        className={`mx-auto w-full max-w-lg flex-1 px-5 py-5 ${showBottomNav ? 'pb-24' : ''} ${className}`}
       >
         {children}
       </main>

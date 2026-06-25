@@ -137,7 +137,7 @@ function buildSessionSvg(session: AnalysisSession) {
   const { drugs, foods, supplements } = groupSessionItems(session);
 
   nodes.push(
-    `<text x="72" y="${y}" ${titleFont} font-size="34" font-weight="800" fill="#0F172A">약 조심</text>`,
+    `<text x="72" y="${y}" ${titleFont} font-size="34" font-weight="800" fill="#12372D">약 조심</text>`,
   );
   y += 46;
   nodes.push(
@@ -158,7 +158,7 @@ function buildSessionSvg(session: AnalysisSession) {
     `<rect x="56" y="${y - 8}" width="${width - 112}" height="${itemCardHeight}" rx="28" fill="#F8FAFC" stroke="#E2E8F0" />`,
   );
   nodes.push(
-    `<text x="88" y="${y + 28}" ${titleFont} font-size="24" font-weight="700" fill="#0F172A">선택 항목</text>`,
+    `<text x="88" y="${y + 28}" ${titleFont} font-size="24" font-weight="700" fill="#12372D">선택 항목</text>`,
   );
 
   let itemY = y + 74;
@@ -212,7 +212,7 @@ function buildSessionSvg(session: AnalysisSession) {
         `<text x="${84 + Math.round(badgeWidth / 2)}" y="${y + 41}" text-anchor="middle" ${titleFont} font-size="17" font-weight="800" fill="${badgeTextColor}">${escapeText(getRiskDisplayLabel(result.severity))}</text>`,
       );
       nodes.push(
-        `<text x="${84 + badgeWidth + 16}" y="${y + 41}" ${titleFont} font-size="20" font-weight="800" fill="#0F172A">${escapeText(`${result.rule.subjectName} + ${result.rule.objectName}`)}</text>`,
+        `<text x="${84 + badgeWidth + 16}" y="${y + 41}" ${titleFont} font-size="20" font-weight="800" fill="#12372D">${escapeText(`${result.rule.subjectName} + ${result.rule.objectName}`)}</text>`,
       );
 
       nodes.push(
@@ -399,7 +399,7 @@ export function saveSessionAsPdf(session: AnalysisSession, title: string) {
         <title>${title}</title>
         <style>
           * { box-sizing: border-box; }
-          body { margin: 0; padding: 24px; background: #f9fafb; font-family: Pretendard, Apple SD Gothic Neo, Noto Sans KR, sans-serif; color: #111827; font-size: 14px; }
+          body { margin: 0; padding: 24px; background: #f9fafb; font-family: Pretendard, Apple SD Gothic Neo, Noto Sans KR, sans-serif; color: #12372D; font-size: 14px; }
           .sheet { max-width: 720px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 20px; padding: 32px; }
           .header { margin-bottom: 8px; }
           .header h1 { margin: 0; font-size: 26px; font-weight: 800; }
@@ -413,7 +413,7 @@ export function saveSessionAsPdf(session: AnalysisSession, title: string) {
           .badge-critical { background: #fee2e2; color: #b91c1c; }
           .badge-caution { background: #fff7ed; color: #c2410c; }
           .badge-unknown { background: #f3f4f6; color: #6b7280; }
-          .card-title { font-size: 14px; font-weight: 700; color: #0f172a; }
+          .card-title { font-size: 14px; font-weight: 700; color: #12372D; }
           .card-divider { border: none; border-top: 1px solid #e2e8f0; margin: 0; }
           .card-body { padding: 7px 14px 10px; }
           .card-tag { margin: 0 0 2px; font-size: 11px; font-weight: 600; color: #94a3b8; }

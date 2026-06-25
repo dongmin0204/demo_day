@@ -1,221 +1,229 @@
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { motion, AnimatePresence } from 'motion/react';
 import {
-  Pill,
-  ClipboardList,
-  Camera,
-  Search,
-  ShieldCheck,
-  ChevronRight,
   ArrowRight,
+  Search,
+  Camera,
+  ChevronRight,
+  AlertTriangle,
+  AlertCircle,
+  HelpCircle,
 } from 'lucide-react';
-//나중에 이미지나 좋은 디자인으로 변경하기 임시로 lucide 사용
+import { BottomNav } from '@/components/layout/BottomNav';
 import { Card, CardContent } from '@/app/components/ui/card';
-import { Button } from '@/app/components/ui/button';
-import { PageContainer } from '@/components/layout/PageContainer';
+import { RiskBadge } from '@/components/common/RiskBadge';
+import { getRiskDisplaySeverity } from '@/utils/risk';
+import type { Severity } from '@/types';
 
-const features = [
-  {
-    icon: Search,
-    title: '약 이름으로 빠르게 검색',
-    description: '복용 중인 약을 검색하고, 처방전 촬영으로도 찾을 수 있어요.',
-    color: 'bg-blue-50 text-blue-600',
-  },
-  {
-    icon: ClipboardList,
-    title: '조합 분석 한번에',
-    description: '약 + 음식 + 영양제 조합의 위험 여부를 바로 확인해요.',
-    color: 'bg-orange-50 text-orange-600',
-  },
-  {
-    icon: ShieldCheck,
-    title: '전문 데이터 기반 안내',
-    description: '약학정보원·식약처 DUR 데이터 기반으로 안내합니다.',
-    color: 'bg-emerald-50 text-emerald-600',
-  },
+/* ──────────────────────────────────────────────────────────────
+ * v3 — Landing scene. Raycast / Linear / Perplexity.
+ *  - Real entry points, no fake user data.
+ *  - The 상호작용 예시 previews a REAL 식약처 DUR record (rotates 5s).
+ *  - Result card follows the original ResultsPage card; only the
+ *    circular gauge is new. Display-only (not clickable).
+ * ────────────────────────────────────────────────────────────── */
+
+const FONT_STACK =
+  "'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', sans-serif";
+
+const entries = [
+  { label: '약 검색', meta: '약 이름·성분으로', path: '/search' as const, icon: Search },
+  { label: '처방전 촬영', meta: '사진 한 장으로', path: '/ocr' as const, icon: Camera },
 ] as const;
 
-const steps = [
-  {
-    number: '1',
-    title: '약을 찾거나 추가해요',
-    description: '약 이름으로 검색하고, 필요하면 처방전 촬영으로 검색을 도와줄 수 있어요.',
-  },
-  {
-    number: '2',
-    title: '함께 먹는 것을 선택해요',
-    description: '대표 목록에서 음식이나 영양제를 빠르게 추가하고 조합해요.',
-  },
-  {
-    number: '3',
-    title: '위험도와 가이드를 확인해요',
-    description: '금기, 주의, 확인 정보 없음으로 결과를 보고 행동 가이드도 함께 확인해요.',
-  },
-] as const;
+/* Real 식약처 DUR 병용금기·주의 records (real regulatory facts). */
+type DurResult = {
+  subject: string;
+  object: string;
+  severity: Severity;
+  reason: string;
+  tag: string;
+};
+const DUR_RESULTS: DurResult[] = [
+  { subject: '이트라코나졸', object: '심바스타틴', severity: 'critical', reason: '횡문근융해증', tag: '상담 권장' },
+  { subject: '클래리스로마이신', object: '심바스타틴', severity: 'critical', reason: '횡문근융해증', tag: '상담 권장' },
+  { subject: '케토코나졸', object: '심바스타틴', severity: 'critical', reason: '횡문근융해증', tag: '상담 권장' },
+  { subject: '실데나필', object: '니트로글리세린', severity: 'critical', reason: '중증 저혈압', tag: '상담 권장' },
+  { subject: '콜키신', object: '클래리스로마이신', severity: 'critical', reason: '콜키신 독성', tag: '상담 권장' },
+  { subject: '자몽주스', object: '심바스타틴', severity: 'medium', reason: '혈중 농도 상승', tag: '복용 주의' },
+];
 
-const actionCards = [
-  {
-    label: '약 검색',
-    description: '약 이름으로 찾고 필요하면 촬영으로 보조 검색할 수 있어요.',
-    path: '/search' as const,
-    icon: Pill,
-    color: 'bg-blue-50 text-blue-600',
+const ROTATE_MS = 5000;
+
+const gaugeConfig = {
+  critical: { color: '#DC2626', fill: 0.92, Icon: AlertTriangle },
+  caution: { color: '#D97706', fill: 0.55, Icon: AlertCircle },
+  unknown: { color: '#9CA3AF', fill: 0.12, Icon: HelpCircle },
+} as const;
+
+/** New element: a circular gauge that visualises the categorical severity
+ *  (no fabricated numeric score). */
+function RiskGauge({ severity }: { severity: Severity }) {
+  const { color, fill, Icon } = gaugeConfig[getRiskDisplaySeverity(severity)];
+  return (
+    <div
+      className="relative grid h-12 w-12 shrink-0 place-items-center rounded-full"
+      style={{ background: `conic-gradient(${color} ${fill * 360}deg, #EDEFF2 0deg)` }}
+    >
+      <div className="grid h-9 w-9 place-items-center rounded-full bg-white">
+        <Icon className="h-[18px] w-[18px]" style={{ color }} strokeWidth={2} />
+      </div>
+    </div>
+  );
+}
+
+const container = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.07, delayChildren: 0.03 } },
+};
+const item = {
+  hidden: { opacity: 0, y: 14 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] as const },
   },
-  {
-    label: '처방전 촬영',
-    description: '처방전 사진으로 약물을 빠르게 인식하고 추가할 수 있어요.',
-    path: '/ocr' as const,
-    icon: Camera,
-    color: 'bg-violet-50 text-violet-600',
-  },
-] as const;
+};
 
 export default function HomePage() {
   const navigate = useNavigate();
 
+  // rotate a random real DUR record every 5s
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => {
+      setIdx((prev) => {
+        if (DUR_RESULTS.length <= 1) return prev;
+        let next = prev;
+        while (next === prev) next = Math.floor(Math.random() * DUR_RESULTS.length);
+        return next;
+      });
+    }, ROTATE_MS);
+    return () => clearInterval(id);
+  }, []);
+  const current = DUR_RESULTS[idx];
+
   return (
-    <PageContainer showBottomNav>
-      <div className="space-y-8">
-        {/* 맨 앞 히어로 */}
-        <section className="animate-fade-in overflow-hidden rounded-[28px] bg-[linear-gradient(135deg,#eff6ff_0%,#ffffff_50%,#ecfeff_100%)] p-6 shadow-sm ring-1 ring-blue-100">
-          <div className="flex items-start justify-between gap-4">
-            <div className="space-y-3">
-              <div className="inline-flex items-center gap-2 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-blue-700 ring-1 ring-blue-100">
-                <ShieldCheck className="h-3.5 w-3.5" />
-                복약 안전 안내 서비스
-              </div>
-              <div className="space-y-2">
-                <h2 className="text-2xl font-bold tracking-tight text-gray-900">
-                  지금 먹으려는 조합,
-                  <br />
-                  먼저 확인해보세요
-                </h2>
-                <p className="text-sm leading-6 text-gray-600">
-                  약, 음식, 영양제 조합의 위험 여부를
-                  <br className="hidden min-[360px]:block" />
-                  쉬운 말로 안내해드려요.
-                </p>
-              </div>
-            </div>
+    <div className="min-h-screen bg-[#FBFBFC]" style={{ fontFamily: FONT_STACK }}>
+      <motion.main
+        variants={container}
+        initial="hidden"
+        animate="show"
+        className="mx-auto max-w-lg px-5 pb-28 pt-7"
+      >
+        {/* ── minimal top bar ── */}
+        <motion.div variants={item} className="flex items-center justify-between">
+          <span className="text-[15px] font-bold tracking-[-0.01em] text-foreground">
+            약 조심
+          </span>
+          <span className="rounded-full border border-[#E6E6E9] px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-gray-500">
+            DUR 기반
+          </span>
+        </motion.div>
 
-            <div className="animate-float hidden rounded-3xl bg-white/80 p-4 shadow-sm ring-1 ring-blue-100 sm:block">
-              <Pill className="h-10 w-10 text-blue-500" />
-            </div>
-          </div>
-
-          <div
-            className="animate-slide-up mt-5 flex flex-wrap gap-2"
-            style={{ animationDelay: '0.2s' }}
-          >
-            <span className="rounded-full bg-white px-3 py-1 text-xs font-medium text-gray-600 ring-1 ring-gray-200">
-              비회원 바로 이용
-            </span>
-            <span className="rounded-full bg-white px-3 py-1 text-xs font-medium text-gray-600 ring-1 ring-gray-200">
-              금기 · 주의 · 정보 없음
-            </span>
-            <span className="rounded-full bg-white px-3 py-1 text-xs font-medium text-gray-600 ring-1 ring-gray-200">
-              결과 이미지/PDF 저장
-            </span>
-          </div>
-
-          <Button
-            className="animate-slide-up mt-5 h-12 w-full rounded-2xl text-sm font-semibold"
-            style={{ animationDelay: '0.35s' }}
-            size="lg"
-            onClick={() => navigate('/combine')}
-          >
-            바로 분석 시작하기
-            <ArrowRight className="ml-1 h-4 w-4" />
-          </Button>
-        </section>
-
-        {/* 특징 설명 세션*/}
-        <section className="space-y-3">
-          <h3
-            className="animate-slide-up px-1 text-lg font-semibold text-gray-900"
-            style={{ animationDelay: '0.3s' }}
-          >
-            주요 기능
-          </h3>
-          <div className="grid gap-3">
-            {features.map(({ icon: Icon, title, description, color }, i) => (
-              <Card
-                key={title}
-                className="animate-slide-up border-0 shadow-sm ring-1 ring-gray-200"
-                style={{ animationDelay: `${0.35 + i * 0.1}s` }}
-              >
-                <CardContent className="flex items-start gap-4 p-4">
-                  <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${color}`}>
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="font-semibold text-gray-900">{title}</p>
-                    <p className="mt-1 text-sm leading-relaxed text-gray-500">{description}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
-
-        {/* 바로가기 */}
-        <section className="space-y-3">
-          <h3
-            className="animate-slide-up px-1 text-lg font-semibold text-gray-900"
-            style={{ animationDelay: '0.5s' }}
-          >
-            바로가기
-          </h3>
-          <div className="grid grid-cols-2 gap-3">
-            {actionCards.map(({ label, description, path, icon: Icon, color }, i) => (
-              <Card
-                key={path}
-                className="animate-slide-up cursor-pointer border-0 shadow-sm ring-1 ring-gray-200 transition-all hover:-translate-y-0.5 hover:shadow-md"
-                style={{ animationDelay: `${0.55 + i * 0.1}s` }}
-                onClick={() => navigate(path)}
-              >
-                <CardContent className="flex flex-col gap-3 p-4">
-                  <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${color}`}>
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-gray-900">{label}</p>
-                    <p className="mt-0.5 text-xs leading-relaxed text-gray-500">{description}</p>
-                  </div>
-                  <ChevronRight className="h-4 w-4 self-end text-gray-300" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
-
-        {/* 어떤 기능이 있나요?? */}
-        <section
-          className="animate-slide-up space-y-4"
-          style={{ animationDelay: '0.6s' }}
+        {/* ── HERO — value proposition, asymmetric ── */}
+        <motion.p
+          variants={item}
+          className="mt-14 font-mono text-[11px] uppercase tracking-[0.16em] text-gray-400"
         >
-          <h3 className="px-1 text-lg font-semibold text-gray-900">
-            이렇게 확인해요
-          </h3>
-          <div className="space-y-3">
-            {steps.map(({ number, title, description }, i) => (
-              <div
-                key={number}
-                className="animate-slide-in-right flex gap-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-100"
-                style={{ animationDelay: `${0.7 + i * 0.12}s` }}
-              >
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white">
-                  {number}
-                </div>
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-gray-900">{title}</p>
-                  <p className="mt-1 text-sm leading-relaxed text-gray-500">{description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
+          복약 상호작용 분석
+        </motion.p>
+        <motion.h1
+          variants={item}
+          className="mt-3 text-[38px] font-bold leading-[1.08] tracking-[-0.03em] text-foreground"
+        >
+          같이 먹어도
+          <br />
+          괜찮을까요?
+        </motion.h1>
+        <motion.p variants={item} className="mt-4 max-w-[19rem] text-[15px] leading-[1.6] text-gray-500">
+          약·음식·영양제 조합의 위험 여부를
+          <br />
+          약학정보원·식약처 DUR 데이터로 확인해요.
+        </motion.p>
 
-      </div>
-    </PageContainer>
+        {/* primary CTA — deep clinical green, asymmetric */}
+        <motion.button
+          variants={item}
+          type="button"
+          onClick={() => navigate('/combine')}
+          whileHover={{ y: -1 }}
+          whileTap={{ scale: 0.99 }}
+          transition={{ type: 'spring', stiffness: 420, damping: 30 }}
+          className="mt-7 flex h-[54px] w-full items-center justify-between rounded-2xl bg-primary px-5 text-primary-foreground shadow-[0_10px_24px_-10px_rgba(15,76,58,0.55)] hover:bg-primary/90"
+        >
+          <span className="text-[15px] font-semibold tracking-[-0.01em]">조합 분석 시작</span>
+          <ArrowRight className="h-[18px] w-[18px]" strokeWidth={2} />
+        </motion.button>
+
+        {/* secondary entries — list rows, not feature cards */}
+        <motion.div variants={item} className="mt-4">
+          {entries.map(({ label, meta, path, icon: Icon }, i) => (
+            <button
+              key={path}
+              type="button"
+              onClick={() => navigate(path)}
+              className={`flex w-full items-center gap-3.5 py-3.5 text-left transition-colors hover:opacity-70 ${
+                i < entries.length - 1 ? 'border-b border-[#EFEFF1]' : ''
+              }`}
+            >
+              <Icon className="h-[18px] w-[18px] text-gray-500" strokeWidth={1.75} />
+              <span className="text-[15px] font-medium tracking-[-0.01em] text-foreground">
+                {label}
+              </span>
+              <span className="font-mono text-[12px] text-gray-400">{meta}</span>
+              <ChevronRight className="ml-auto h-4 w-4 text-gray-300" strokeWidth={2} />
+            </button>
+          ))}
+        </motion.div>
+
+        {/* ── 상호작용 예시 — real 식약처 DUR record (display only) ── */}
+        <motion.section variants={item} className="mt-12">
+          <p className="mb-3 text-[14px] font-semibold tracking-[-0.01em] text-foreground">
+            상호작용 예시
+          </p>
+
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <Card>
+                <CardContent className="flex items-center gap-3 p-4">
+                  {/* new: circular severity gauge */}
+                  <RiskGauge severity={current.severity} />
+
+                  <div className="min-w-0 flex-1">
+                    <p className="text-pretty font-medium text-foreground" data-slot="result-pair-name">
+                      {current.subject} + {current.object}
+                    </p>
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      <RiskBadge severity={current.severity} />
+                      <span className="rounded-full bg-orange-50 px-2.5 py-1 text-xs font-medium text-orange-700">
+                        {current.tag}
+                      </span>
+                    </div>
+                    <p className="mt-1.5 text-xs text-gray-500">사유 · {current.reason}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </AnimatePresence>
+
+          <p className="mt-2.5 font-mono text-[11px] text-gray-400">출처 · 식약처 DUR</p>
+        </motion.section>
+
+        {/* ── trust footer ── */}
+        <motion.p variants={item} className="mt-12 font-mono text-[11px] text-gray-400">
+          Powered by 식약처 DUR · 약학정보원
+        </motion.p>
+      </motion.main>
+
+      <BottomNav />
+    </div>
   );
 }

@@ -70,7 +70,7 @@ export default function App() {
                 toastOptions={{
                   classNames: {
                     toast:
-                      'rounded-2xl border border-gray-200 bg-white text-gray-900 shadow-lg',
+                      'rounded-2xl border border-gray-200 bg-white text-foreground shadow-lg',
                     title: 'text-sm font-medium',
                     description: 'text-sm text-gray-600',
                   },

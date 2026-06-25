@@ -15,7 +15,7 @@ export function BottomNav() {
   return (
     <nav
       data-slot="bottom-nav"
-      className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-200 bg-white"
+      className="fixed bottom-0 left-0 right-0 z-50 border-t border-[#EFEFF1] bg-[#FBFBFC]/90 backdrop-blur-sm"
     >
       <div
         data-slot="bottom-nav-inner"
@@ -28,15 +28,13 @@ export function BottomNav() {
               data-slot="bottom-nav-button"
               key={path}
               onClick={() => navigate(path)}
-              className={`flex flex-col items-center gap-1 px-3 py-2 text-xs transition-colors ${
-                isActive
-                  ? 'text-blue-600'
-                  : 'text-gray-500 hover:text-gray-700'
+              className={`flex flex-col items-center gap-1 px-3 py-2 text-[11px] font-medium tracking-[-0.01em] transition-colors ${
+                isActive ? 'text-primary' : 'text-gray-400 hover:text-gray-600'
               }`}
               aria-label={label}
               aria-current={isActive ? 'page' : undefined}
             >
-              <Icon className="h-5 w-5" />
+              <Icon className="h-[22px] w-[22px]" strokeWidth={isActive ? 2 : 1.75} />
               <span>{label}</span>
             </button>
           );

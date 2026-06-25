@@ -46,15 +46,15 @@ export default function SettingsPage() {
 
   return (
     <PageContainer title="설정" showBottomNav>
-      <div className="space-y-4">
+      <div className="space-y-7">
         {/* Accessibility */}
         <SectionCard title="접근성">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-4">
             <div>
-              <Label htmlFor="senior-mode" className="text-sm font-medium">
+              <Label htmlFor="senior-mode" className="text-[15px] font-medium text-foreground">
                 고령층 모드
               </Label>
-              <p className="text-xs text-gray-400">
+              <p className="mt-0.5 text-[13px] text-gray-400">
                 글꼴과 터치 영역을 키워 앱 전체를 읽기 쉽게 합니다
               </p>
             </div>
@@ -68,11 +68,11 @@ export default function SettingsPage() {
 
         {/* Risk legend */}
         <SectionCard title="위험도 범례">
-          <div className="space-y-3">
+          <div className="space-y-3.5">
             {riskLevels.map(({ displaySeverity, badgeSeverity, description }) => (
               <div key={displaySeverity} className="flex items-start gap-3">
                 <RiskBadge severity={badgeSeverity} />
-                <p className="flex-1 text-sm text-gray-600">{description}</p>
+                <p className="flex-1 text-[13px] leading-[1.55] text-gray-500">{description}</p>
               </div>
             ))}
           </div>
@@ -80,10 +80,12 @@ export default function SettingsPage() {
 
         {/* Service info */}
         <SectionCard title="서비스 정보">
-          <div className="space-y-2 text-sm text-gray-600">
-            <p className="font-medium">약 조심 v1.0</p>
-            <p>본 서비스는 의료 진단을 대체하지 않습니다.</p>
-            <p>데이터 출처: 약학정보원, 식품의약품안전처 DUR</p>
+          <div className="space-y-2">
+            <p className="text-[15px] font-semibold tracking-[-0.01em] text-foreground">약 조심 v1.0</p>
+            <p className="text-[13px] text-gray-500">본 서비스는 의료 진단을 대체하지 않습니다.</p>
+            <p className="font-mono text-[11px] text-gray-400">
+              데이터 출처 · 약학정보원 · 식품의약품안전처 DUR
+            </p>
           </div>
         </SectionCard>
 
@@ -91,7 +93,7 @@ export default function SettingsPage() {
         <SectionCard title="데이터 관리">
           <AlertDialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
             <AlertDialogTrigger asChild>
-              <Button variant="destructive" size="sm">
+              <Button variant="outline" size="sm" className="rounded-xl text-red-600 hover:text-red-700">
                 <Trash2 className="mr-2 h-4 w-4" />
                 모든 데이터 초기화
               </Button>
@@ -106,9 +108,7 @@ export default function SettingsPage() {
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>취소</AlertDialogCancel>
-                <AlertDialogAction onClick={handleReset}>
-                  초기화
-                </AlertDialogAction>
+                <AlertDialogAction onClick={handleReset}>초기화</AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
